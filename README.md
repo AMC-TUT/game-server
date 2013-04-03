@@ -1,4 +1,4 @@
 game-server
 ===========
 
-Very simple game server implementation on node and socket.io
+Very simple game server implementation on node.js and socket.io

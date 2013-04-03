@@ -8,6 +8,7 @@ io.enable('browser client etag'); // apply etag caching logic based on version n
 io.enable('browser client gzip'); // gzip the file
 io.set('log level', 0); // reduce logging
 io.set('transports', ['websocket', 'flashsocket', 'htmlfile', 'xhr-polling', 'jsonp-polling']);
+io.set('origins','*:*');
 
 var Room = io.sockets.on('connection', function(socket) {
 

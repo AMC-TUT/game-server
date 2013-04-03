@@ -1,7 +1,7 @@
 // note, io.listen(<port>) will create a http server for you
 var _ = require('underscore')._;
 
-var io = require('socket.io').listen(9999);
+var io = require('socket.io').listen(9002);
 
 io.enable('browser client minification'); // send minified client
 io.enable('browser client etag'); // apply etag caching logic based on version number

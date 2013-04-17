@@ -7,11 +7,12 @@ io.enable('browser client minification'); // send minified client
 io.enable('browser client etag'); // apply etag caching logic based on version number
 io.enable('browser client gzip'); // gzip the file
 io.set('log level', 0); // reduce logging
-io.set('transports', ['websocket', 'flashsocket', 'htmlfile', 'xhr-polling', 'jsonp-polling']);
-io.set('origins','*:*');
+io.set('transports', ['websocket', 'flashsocket', 'htmlfile', 'xhr-polling', 'jsonp-polling']); // supported transport methods
+io.set('origins','*:*'); // allow cross origin messaging
 
 var Room = io.sockets.on('connection', function(socket) {
 
+  // local vars
   var joinedRoom = null;
   var clientRole = null; // as default, game is manager
   var maxClients = 0;
@@ -40,15 +41,18 @@ var Room = io.sockets.on('connection', function(socket) {
 
       socket.join(data.room);
 
+      // data to local (socket) vars
       joinedRoom = data.room; // string (client id)
       clientRole = data.clientRole; // MANAGER || CLIENT
       maxClients = data.maxClients; // int
 
+      // set vars to store
       socket.store.data = {
         clientRole: data.clientRole,
         maxClients: data.maxClients
       };
 
+      // callback
       fn({
         'room': data.room
       });
@@ -111,6 +115,7 @@ var Room = io.sockets.on('connection', function(socket) {
         socketId: socket.id
       });
 
+      // callback
       fn({
         'code': 200,
         'msg': 'Liityit pelihuoneeseen'
@@ -119,19 +124,23 @@ var Room = io.sockets.on('connection', function(socket) {
     }
   });
 
+/* control message from client to game & from game to clients */
 socket.on('c', function(data) {
 
     // add from value
     if (clientRole == 'client') {
+      // console.log('joinedRoom client ' + joinedRoom);
       // send control message to game
       io.sockets.socket(joinedRoom).emit('c', socket.id, data.obj);
     } else {
+      // console.log('joinedRoom game ' + joinedRoom);
       // send control message to all clients
       io.sockets.in(joinedRoom).emit('c', null, data.obj);
     }
 
   });
 
+/* unsubscribe message */
 socket.on('unsubscribe', function(data) {
   io.sockets.in(joinedRoom).emit('clientLeftTheRoom', {
     name: name,

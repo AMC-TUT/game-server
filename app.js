@@ -23,13 +23,16 @@ var Room = io.sockets.on('connection', function(socket) {
   });
 
   socket.on('disconnect', function() {
-    if (clientRole == 'manager') {
+    if (clientRole == 'manager' && _.isNull(joinedRoom)) {
       socket.broadcast.to(joinedRoom).emit('managerDisconnected', true);
     } else {
-      io.sockets. in (joinedRoom).emit('clientLeftTheRoom', {
-        name: name,
-        socketId: socket.id
-      });
+      if(!_.isNull(joinedRoom)) {
+        io.sockets.in(joinedRoom).emit('clientLeftTheRoom', {
+          name: name,
+          socketId: socket.id
+        });
+      }
+
     }
   });
 
@@ -37,7 +40,7 @@ var Room = io.sockets.on('connection', function(socket) {
     // console.log(io.transports[socket.id].name); // connection type, eg. websocket
 
     // if manager (game)
-    if (!_.isUndefined(data.clientRole) && data.clientRole == 'manager') {
+    if (!_.isUndefined(data.clientRole) && data.clientRole === 'manager') {
 
       socket.join(data.room);
 
@@ -57,7 +60,7 @@ var Room = io.sockets.on('connection', function(socket) {
         'room': data.room
       });
 
-    } else if (!_.isUndefined(data.clientRole) && data.clientRole == 'client') { // if client
+    } else if (!_.isUndefined(data.clientRole) && data.clientRole === 'client') { // if client
 
       var result = {};
 
@@ -89,7 +92,7 @@ var Room = io.sockets.on('connection', function(socket) {
           joinedRoom = data.room;
           name = data.name;
 
-          io.sockets. in (joinedRoom).emit('clientJoinedToRoom', {
+          io.sockets.in(joinedRoom).emit('clientJoinedToRoom', {
             name: name,
             socketId: socket.id
           });
@@ -110,7 +113,7 @@ var Room = io.sockets.on('connection', function(socket) {
       joinedRoom = data.room;
       name = data.name;
 
-      io.sockets. in (joinedRoom).emit('clientJoinedToRoom', {
+      io.sockets.in(joinedRoom).emit('clientJoinedToRoom', {
         name: name,
         socketId: socket.id
       });
@@ -127,7 +130,7 @@ var Room = io.sockets.on('connection', function(socket) {
   /* control message from client to game & from game to clients */
   socket.on('c', function(data) {
 
-    // console.log(name + ' ' + joinedRoom);
+    console.log(name + ' ' + joinedRoom);
 
     if (_.isNull(joinedRoom)) {
       return false;

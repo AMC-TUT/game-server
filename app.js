@@ -8,7 +8,7 @@ io.enable('browser client etag'); // apply etag caching logic based on version n
 io.enable('browser client gzip'); // gzip the file
 io.set('log level', 0); // reduce logging
 io.set('transports', ['websocket', 'flashsocket', 'htmlfile', 'xhr-polling', 'jsonp-polling']); // supported transport methods
-io.set('origins','*:*'); // allow cross origin messaging
+io.set('origins', '*:*'); // allow cross origin messaging
 
 var Room = io.sockets.on('connection', function(socket) {
 
@@ -26,7 +26,7 @@ var Room = io.sockets.on('connection', function(socket) {
     if (clientRole == 'manager') {
       socket.broadcast.to(joinedRoom).emit('managerDisconnected', true);
     } else {
-      io.sockets.in(joinedRoom).emit('clientLeftTheRoom', {
+      io.sockets. in (joinedRoom).emit('clientLeftTheRoom', {
         name: name,
         socketId: socket.id
       });
@@ -89,7 +89,7 @@ var Room = io.sockets.on('connection', function(socket) {
           joinedRoom = data.room;
           name = data.name;
 
-          io.sockets.in(joinedRoom).emit('clientJoinedToRoom', {
+          io.sockets. in (joinedRoom).emit('clientJoinedToRoom', {
             name: name,
             socketId: socket.id
           });
@@ -110,7 +110,7 @@ var Room = io.sockets.on('connection', function(socket) {
       joinedRoom = data.room;
       name = data.name;
 
-      io.sockets.in(joinedRoom).emit('clientJoinedToRoom', {
+      io.sockets. in (joinedRoom).emit('clientJoinedToRoom', {
         name: name,
         socketId: socket.id
       });
@@ -124,30 +124,35 @@ var Room = io.sockets.on('connection', function(socket) {
     }
   });
 
-/* control message from client to game & from game to clients */
-socket.on('c', function(data) {
+  /* control message from client to game & from game to clients */
+  socket.on('c', function(data) {
+
+    // console.log(name + ' ' + joinedRoom);
+
+    if (_.isNull(joinedRoom)) {
+      return false;
+    }
 
     // add from value
     if (clientRole == 'client') {
-      // console.log('joinedRoom client ' + joinedRoom);
       // send control message to game
       io.sockets.socket(joinedRoom).emit('c', socket.id, data.obj);
     } else {
-      // console.log('joinedRoom game ' + joinedRoom);
+      // Emitting an event to all clients in a particular room
+      // io.sockets.in('room').emit('event_name', data)
       // send control message to all clients
-      io.sockets.in(joinedRoom).emit('c', null, data.obj);
+      io.sockets. in (joinedRoom).emit('c', null, data.obj);
     }
 
   });
 
-/* unsubscribe message */
-socket.on('unsubscribe', function(data) {
-  io.sockets.in(joinedRoom).emit('clientLeftTheRoom', {
-    name: name,
-    socketId: socket.id
+  /* unsubscribe message */
+  socket.on('unsubscribe', function(data) {
+    io.sockets. in (joinedRoom).emit('clientLeftTheRoom', {
+      name: name,
+      socketId: socket.id
+    });
+    socket.leave(data.room);
   });
-  socket.leave(data.room);
-});
 
 });
-

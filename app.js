@@ -1,13 +1,16 @@
 // note, io.listen(<port>) will create a http server for you
-var _ = require('underscore')._;
+var _ = require('underscore')._,
+    redis = require('redis');
+
+var client = redis.createClient();
 
 var io = require('socket.io').listen(9002);
 
 io.enable('browser client minification'); // send minified client
 io.enable('browser client etag'); // apply etag caching logic based on version number
 io.enable('browser client gzip'); // gzip the file
-io.set('log level', 0); // reduce logging
-io.set('transports', ['websocket', 'flashsocket', 'htmlfile', 'xhr-polling', 'jsonp-polling']); // supported transport methods
+// io.set('log level', 0); // reduce logging
+io.set('transports', ['websocket', 'htmlfile', 'xhr-polling', 'jsonp-polling']); // supported transport methods
 io.set('origins', '*:*'); // allow cross origin messaging
 
 var Room = io.sockets.on('connection', function(socket) {
@@ -23,7 +26,7 @@ var Room = io.sockets.on('connection', function(socket) {
   });
 
   socket.on('disconnect', function() {
-    if (clientRole == 'manager' && _.isNull(joinedRoom)) {
+    if (clientRole === 'manager' && !_.isNull(joinedRoom)) {
       socket.broadcast.to(joinedRoom).emit('managerDisconnected', true);
     } else {
       if(!_.isNull(joinedRoom)) {
@@ -49,11 +52,10 @@ var Room = io.sockets.on('connection', function(socket) {
       clientRole = data.clientRole; // MANAGER || CLIENT
       maxClients = data.maxClients; // int
 
-      // set vars to store
-      socket.store.data = {
-        clientRole: data.clientRole,
-        maxClients: data.maxClients
-      };
+      // set maxClients count in Redis
+      client.set('game-server:'+data.room+':maxClients', data.maxClients, redis.print);
+      // Expire in 8 hours
+      client.expire('game-server:'+data.room+':maxClients', 28800000);
 
       // callback
       fn({
@@ -75,33 +77,41 @@ var Room = io.sockets.on('connection', function(socket) {
         };
       } else {
 
-        if (!_.isNull(io.sockets.clients(data.room)[0].store.data)) {
-          maxClients = io.sockets.clients(data.room)[0].store.data.maxClients || 0;
-        }
+        client.get('game-server:'+data.room+':maxClients', function (err, reply) {
+          if (err) {
+              console.log("Get Redis error: " + err);
+          } else {
+            maxClients = parseInt(reply, 10);
+            console.log('Redis maxClients: ' + maxClients);
 
-        // room maxClients count
-        if (io.sockets.clients(data.room).length > maxClients) {
-          result = {
-            'code': 403,
-            'msg': 'Pelihuone on täynnä'
-          };
-        } else {
-          // join to the room
-          socket.join(data.room);
+            // room maxClients count
+            if (io.sockets.clients(data.room).length > maxClients) {
+              result = {
+                'code': 403,
+                'msg': 'Pelihuone on täynnä'
+              };
+            } else {
+              // join to the room
+              socket.join(data.room);
 
-          joinedRoom = data.room;
-          name = data.name;
+              joinedRoom = data.room;
+              name = data.name;
 
-          io.sockets.in(joinedRoom).emit('clientJoinedToRoom', {
-            name: name,
-            socketId: socket.id
-          });
+              io.sockets.in(joinedRoom).emit('clientJoinedToRoom', {
+                name: name,
+                socketId: socket.id
+              });
 
-          result = {
-            'code': 200,
-            'msg': 'Liityit pelihuoneeseen'
-          };
-        }
+              result = {
+                'code': 200,
+                'msg': 'Liityit pelihuoneeseen'
+              };
+            }
+
+          }
+        });
+
+
       }
 
       fn(result);
@@ -137,21 +147,21 @@ var Room = io.sockets.on('connection', function(socket) {
     }
 
     // add from value
-    if (clientRole == 'client') {
+    if (clientRole === 'client') {
       // send control message to game
       io.sockets.socket(joinedRoom).emit('c', socket.id, data.obj);
     } else {
       // Emitting an event to all clients in a particular room
       // io.sockets.in('room').emit('event_name', data)
       // send control message to all clients
-      io.sockets. in (joinedRoom).emit('c', null, data.obj);
+      io.sockets.in(joinedRoom).emit('c', null, data.obj);
     }
 
   });
 
   /* unsubscribe message */
   socket.on('unsubscribe', function(data) {
-    io.sockets. in (joinedRoom).emit('clientLeftTheRoom', {
+    io.sockets.in(joinedRoom).emit('clientLeftTheRoom', {
       name: name,
       socketId: socket.id
     });

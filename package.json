@@ -1,12 +1,12 @@
 {
   "name": "game-server",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "simple game server",
   "main": "app.js",
   "dependencies": {
-    "socket.io": "~0.8.7",
-    "underscore": "~1.4.4",
-    "redis": "~0.8.3"
+    "redis": "~0.8.3",
+    "socket.io": "~0.9.13",
+    "underscore": "~1.4.4"
   },
   "devDependencies": {},
   "scripts": {
@@ -22,6 +22,6 @@
   ],
   "author": "teemu jönkkäri",
   "license": "MIT",
-  "gitHead": "52a149ef814405b4423bd186f78a18dde47f1725",
-  "readmeFilename": "README.md"
+  "readmeFilename": "README.md",
+  "gitHead": "d48afc985accc478f5845ef5b21023734e7579bb"
 }

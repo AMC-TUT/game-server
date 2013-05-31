@@ -1,10 +1,10 @@
 {
   "name": "game-server",
-  "version": "0.0.2",
-  "description": "",
+  "version": "0.0.1",
+  "description": "simple game server",
   "main": "app.js",
   "dependencies": {
-    "socket.io": "~0.9.13",
+    "socket.io": "~0.8.7",
     "underscore": "~1.4.4",
     "redis": "~0.8.3"
   },
@@ -14,10 +14,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/AMC-TUT/socket.io-server.git"
+    "url": "https://github.com/AMC-TUT/game-server.git"
   },
-  "author": "teemu jonkkari",
+  "keywords": [
+    "node.js",
+    "socket.io"
+  ],
+  "author": "teemu jönkkäri",
   "license": "MIT",
-  "readmeFilename": "README.md",
-  "gitHead": "3f410db42fa465c728f57f5d0124ae3298f88b35"
+  "gitHead": "52a149ef814405b4423bd186f78a18dde47f1725",
+  "readmeFilename": "README.md"
 }

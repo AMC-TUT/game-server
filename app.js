@@ -4,14 +4,14 @@ var _ = require('underscore')._,
 
 var client = redis.createClient();
 
-var io = require('socket.io').listen(9002);
+var io = require('socket.io').listen(8080);
 
-io.enable('browser client minification'); // send minified client
-io.enable('browser client etag'); // apply etag caching logic based on version number
-io.enable('browser client gzip'); // gzip the file
-// io.set('log level', 0); // reduce logging
-io.set('transports', ['websocket', 'htmlfile', 'xhr-polling', 'jsonp-polling']); // supported transport methods
-io.set('origins', '*:*'); // allow cross origin messaging
+io.enable('browser client minification');
+io.enable('browser client etag');
+io.enable('browser client gzip');
+io.set('log level', 0);
+io.set('transports', ['websocket', 'htmlfile', 'xhr-polling', 'jsonp-polling']);
+io.set('origins', '*:*');
 
 var Room = io.sockets.on('connection', function(socket) {
 

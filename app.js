@@ -4,7 +4,7 @@ var _ = require('underscore')._,
 
 var client = redis.createClient();
 
-var io = require('socket.io').listen(8080);
+var io = require('socket.io').listen(8081);
 
 io.enable('browser client minification');
 io.enable('browser client etag');

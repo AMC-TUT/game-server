@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <link rel="stylesheet" href="normalize.css">
+  <link rel="stylesheet" href="client.css">
+</head>
+<body>
+
+  <div class="controller">
+    <div class="message"></div>
+
+    <div class="subset">
+      <div class="btn both disabled" data-btn="both"><img src="" alt=""></div>
+      <div class="btn eye disabled" data-btn="eye"><img src="" alt=""></div>
+    </div>
+    <div class="subset">
+      <div class="btn ear disabled" data-btn="ear"><img src="" alt=""></div>
+      <div class="btn none disabled" data-btn="none"><img src="" alt=""></div>
+    </div>
+  </div>
+
+  <div class="signin">
+    <form>
+      <fieldset>
+        <legend>Tunnistautuminen</legend>
+        <label>Nimi</label>
+        <input type="text" class="name" placeholder="Kirjoita tähän nimesi">
+        <span class="help-block">Nimeä käytetään tunnistautumiseen pelissä ja kunnialistalla.</span>
+        <button type="submit" class="button">Kirjaudu</button>
+      </fieldset>
+    </form>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+    <script src="//amc.pori.tut.fi:8081/socket.io/socket.io.js"></script>
+    <script src="../underscore-min.js"></script>
+    <script src="client.js"></script>
+  </body>
+  </html>

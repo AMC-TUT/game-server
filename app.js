@@ -159,6 +159,11 @@ var Room = io.sockets.on('connection', function(socket) {
 
   });
 
+  /* message from client to client */
+  socket.on('msg', function(client, data) {
+    io.sockets.socket(client).emit('msg', socket.id, data);
+  });
+
   /* unsubscribe message */
   socket.on('unsubscribe', function(data) {
     io.sockets.in(joinedRoom).emit('clientLeftTheRoom', {
